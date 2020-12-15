@@ -2,6 +2,7 @@
   "name": "3d-contributions",
   "scripts": {
     "test": "echo \"Error: no test specified\" && exit 1",
+    "preinstall": "npx npm-force-resolutions",
     "start": "node node_modules/gulp/bin/gulp.js auto"
   },
   "devDependencies": {
@@ -11,5 +12,8 @@
   },
   "dependencies": {
     "three": "^0.118.1"
+  },
+  "resolutions": {
+    "graceful-fs": "^4.2.4"
   }
 }

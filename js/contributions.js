@@ -2,6 +2,7 @@ import * as THREE from "./three.module.js";
 import { GLTFLoader } from './GLTFLoader.js';
 import { OrbitControls } from './OrbitControls.js';
 import { GUI } from './dat.gui.module.js';
+import { STLExporter } from './STLExporter.js';
 
 const BASE_LENGTH = 0.834
 const BASE_WIDTH = 0.167
@@ -10,8 +11,8 @@ const CUBE_SIZE = 0.0143
 const MAX_HEIGHT = 0.14
 const FACE_ANGLE = 104.79
 
-let username = "jasonlong"
-let year = "2018"
+let username = "nat"
+let year = "2020"
 let json = {}
 let font = undefined
 let fontSize = 0.025
@@ -19,6 +20,8 @@ let fontHeight = 0.00658 // Extrusion thickness
 
 let camera, scene, renderer
 let bronzeMaterial
+
+var exporter = new STLExporter();
 
 var urlParams = new URLSearchParams(window.location.search);
 
@@ -224,10 +227,31 @@ const init = () => {
   controls.autoRotate = false
   controls.screenSpacePanning = true
   controls.addEventListener('change', render);
+
+  var buttonExportASCII = document.getElementById( 'exportASCII' );
+  buttonExportASCII.addEventListener( 'click', exportASCII );
+
+  var buttonExportBinary = document.getElementById( 'exportBinary' );
+  buttonExportBinary.addEventListener( 'click', exportBinary );
+
 }
 
 const render = () => {
   renderer.render(scene, camera)
+}
+
+function exportASCII() {
+
+  var result = exporter.parse( bronzeMaterial );
+  saveString( result, username + '-' + year + '.stl' );
+
+}
+
+function exportBinary() {
+
+  var result = exporter.parse( scene, { binary: true } );
+  saveArrayBuffer( result, username + '-' + year + '.stl' );
+
 }
 
 //
@@ -243,3 +267,28 @@ const onWindowResize = () => {
 }
 
 window.addEventListener('resize', onWindowResize, false)
+
+
+var link = document.createElement( 'a' );
+link.style.display = 'none';
+document.body.appendChild( link );
+
+function save( blob, filename ) {
+
+  link.href = URL.createObjectURL( blob );
+  link.download = filename;
+  link.click();
+
+}
+
+function saveString( text, filename ) {
+
+  save( new Blob( [ text ], { type: 'text/plain' } ), filename );
+
+}
+
+function saveArrayBuffer( buffer, filename ) {
+
+  save( new Blob( [ buffer ], { type: 'application/octet-stream' } ), filename );
+
+}
