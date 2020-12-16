@@ -15,6 +15,6 @@ Examples:
 
 I've been using `vercel` for local dev. To load up a local server: `vercel dev`.
 
-Note that this version creates a distribution from the 90th percentile on the contributions per day to stop the odd _really_ big days blowing out the scale. It also has a default minimum for non-zero contribition days (10% of the maximum height)
+Note that this version creates a distribution from the 99th percentile on the contributions per day to stop the odd _really_ big days blowing out the scale. It also has a default minimum for non-zero contribition days (10% of the maximum height)
 
 

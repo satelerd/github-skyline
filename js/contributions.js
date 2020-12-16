@@ -207,11 +207,11 @@ const init = () => {
       if (day.count === json.min)
       {
         height = MAX_HEIGHT * 0.1
-      } else if (day.count > json.min && day.count <= json.p90)
+      } else if (day.count > json.min && day.count <= json.p99)
       {
-        height = ((MAX_HEIGHT * 0.1) + (((MAX_HEIGHT * 0.8) / json.p90) * day.count)).toFixed(4)
+        height = ((MAX_HEIGHT * 0.1) + (((MAX_HEIGHT * 0.8) / json.p99) * day.count)).toFixed(4)
       }
-      else if (day.count > json.p90)
+      else if (day.count > json.p99)
       {
         height = ((MAX_HEIGHT * 0.9) + (((MAX_HEIGHT * 0.1) / json.max) * day.count)).toFixed(4)
       }
