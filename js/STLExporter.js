@@ -33,7 +33,7 @@ STLExporter.prototype = {
 
 			if ( object.isMesh ) {
 
-				var geometry = object.geometry;
+ 				var geometry = object.geometry;
 
 				if ( geometry.isGeometry ) {
 

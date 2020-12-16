@@ -12,7 +12,7 @@ const MAX_HEIGHT = 0.14
 const FACE_ANGLE = 104.79
 
 let username = "nat"
-let year = "2020"
+let year = "" + (new Date()).getFullYear()
 let json = {}
 let font = undefined
 let fontSize = 0.025
@@ -35,7 +35,7 @@ if (urlParams.has('year')) {
 
 // Import JSON data
 async function loadJSON(username, year) {
-  let url = `https://json-contributions.vercel.app/api/user?username=${username}&year=${year}`
+  let url = `https://json-contributions-five.vercel.app/api/user?username=${username}&year=${year}`
   let response = await fetch(url)
   if (response.ok) {
     json = await response.json()
@@ -194,14 +194,28 @@ const init = () => {
 
   // CONTRIBUTION BARS
   let barGroup = new THREE.Group()
-  let maxCount = json.max
   let x = 0
   let y = 0
   json.contributions.forEach(week => {
     y = (CUBE_SIZE * 7)
     week.days.forEach(day => {
       y -= CUBE_SIZE
-      let height = (MAX_HEIGHT / maxCount * day.count).toFixed(4)
+      
+      // Adjust height around distribution of values
+      // Needed so that a large day doesn't blow out the scale
+      let height = (0).toFixed(4)
+      if (day.count === json.min)
+      {
+        height = MAX_HEIGHT * 0.1
+      } else if (day.count > json.min && day.count <= json.p90)
+      {
+        height = ((MAX_HEIGHT * 0.1) + (((MAX_HEIGHT * 0.8) / json.p90) * day.count)).toFixed(4)
+      }
+      else if (day.count > json.p90)
+      {
+        height = ((MAX_HEIGHT * 0.9) + (((MAX_HEIGHT * 0.1) / json.max) * day.count)).toFixed(4)
+      }
+
       let geometry = new THREE.BoxGeometry(CUBE_SIZE, CUBE_SIZE, height)
       let cube = new THREE.Mesh(geometry, bronzeMaterial)
       cube.position.x = x
