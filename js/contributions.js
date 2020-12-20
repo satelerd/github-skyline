@@ -20,6 +20,7 @@ let fontHeight = 0.00658 // Extrusion thickness
 
 let camera, scene, renderer
 let bronzeMaterial
+let controls
 
 var exporter = new STLExporter();
 
@@ -40,7 +41,7 @@ async function loadJSON(username, year) {
   if (response.ok) {
     json = await response.json()
     init()
-    render()
+    animate()
   } else {
     alert("HTTP-Error: " + response.status)
   }
@@ -84,6 +85,8 @@ const createText = () => {
     height: fontHeight
   })
 
+  let textGroup = new THREE.Group()
+
   nameGeo.computeBoundingBox()
   nameGeo.computeVertexNormals()
 
@@ -108,7 +111,7 @@ const createText = () => {
 
   nameMesh.geometry.rotateX(FACE_ANGLE * Math.PI / 2)
   nameMesh.geometry.rotateY(Math.PI * 2)
-  scene.add(nameMesh)
+  textGroup.add(nameMesh)
 
   yearGeo = new THREE.BufferGeometry().fromGeometry(yearGeo)
   let yearMesh = new THREE.Mesh(yearGeo, bronzeMaterial)
@@ -119,7 +122,8 @@ const createText = () => {
 
   yearMesh.geometry.rotateX(FACE_ANGLE * Math.PI / 2)
   yearMesh.geometry.rotateY(Math.PI * 2)
-  scene.add(yearMesh)
+  textGroup.add(yearMesh);
+  return textGroup;
 }
 
 const init = () => {
@@ -127,7 +131,7 @@ const init = () => {
   scene = new THREE.Scene()
 
   // CAMERA
-  camera = new THREE.PerspectiveCamera( 75, window.innerWidth / window.innerHeight, 0.01, 100 )
+  camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 10 )
 
   // RENDERER
   renderer = new THREE.WebGLRenderer({ antialias: true })
@@ -137,9 +141,12 @@ const init = () => {
   renderer.setClearColor(0xffffff, 1)
   document.body.appendChild(renderer.domElement)
 
+  const textureLoader = new THREE.CubeTextureLoader();
+  textureLoader.setPath( 'textures/cube/Bridge2/' );
+
   // MATERIALS
   let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x40c463, transparent: true, opacity: 0.2, side: THREE.DoubleSide } )
-  bronzeMaterial = new THREE.MeshPhysicalMaterial( { color: 0x645f61, metalness: 1, clearcoat: 0.5, clearcoatRoughness: 0.5, side: THREE.DoubleSide } )
+  bronzeMaterial = new THREE.MeshStandardMaterial( {metalness: 1, roughness: 0.3})
 
   // LIGHTS
   const dLight1 = new THREE.DirectionalLight(0xebeb8c, 0.8)
@@ -182,15 +189,13 @@ const init = () => {
 
     base.scene.rotation.x = -Math.PI/2
     base.scene.rotation.z = -Math.PI
-    scene.add(base.scene)
-  })
+
 
   // USERNAME + YEAR
   let fontLoader = new THREE.FontLoader()
   fontLoader.load('../fonts/helvetiker_regular.typeface.json', function (response) {
     font = response
-    createText()
-  })
+    let textGroup = createText()
 
   // CONTRIBUTION BARS
   let barGroup = new THREE.Group()
@@ -225,22 +230,41 @@ const init = () => {
     })
     x += CUBE_SIZE
   })
+
+  let group = new THREE.Group()
+  group.add(base.scene)
+  group.add(barGroup)
+  group.add(textGroup)
+
   const groupBox = new THREE.Box3().setFromObject(barGroup)
   const groupCenter = groupBox.getCenter(new THREE.Vector3())
   barGroup.position.x -= groupCenter.x
   barGroup.position.y -= groupCenter.y
-  scene.add(barGroup)
+  scene.add(group)
+  group.rotateX(-Math.PI/2)
+  
+  })
+
+
+  })
 
   const box = new THREE.Box3().setFromObject(scene)
   const center = box.getCenter(new THREE.Vector3())
-  camera.lookAt(center)
-  camera.position.y = -0.4
-  camera.position.z = 0.3
 
-  let controls = new OrbitControls(camera, renderer.domElement)
-  controls.autoRotate = false
-  controls.screenSpacePanning = true
+  controls = new OrbitControls(camera, renderer.domElement)
+  controls.screenSpacePanning = false;
+  controls.minPolarAngle = Math.PI / 3
+  controls.maxPolarAngle = Math.PI / 3;
   controls.addEventListener('change', render);
+  controls.screenSpacePanning = true
+  controls.enableDamping = true
+  controls.enableZoom = false
+  controls.dampingFactor = 0.1;
+
+  camera.lookAt(center)
+  controls.update()
+
+  onWindowResize();
 
   var buttonExportASCII = document.getElementById( 'exportASCII' );
   buttonExportASCII.addEventListener( 'click', exportASCII );
@@ -248,10 +272,23 @@ const init = () => {
   var buttonExportBinary = document.getElementById( 'exportBinary' );
   buttonExportBinary.addEventListener( 'click', exportBinary );
 
+  // const axesHelper = new THREE.AxesHelper( 5 );
+  // scene.add( axesHelper );
+
 }
 
 const render = () => {
   renderer.render(scene, camera)
+}
+
+function animate() {
+
+  requestAnimationFrame( animate );
+
+  controls.update(); // only required if controls.enableDamping = true, or if controls.autoRotate = true
+
+  render();
+
 }
 
 function exportASCII() {
@@ -276,8 +313,9 @@ const onWindowResize = () => {
   let canvasHeight = window.innerHeight;
   renderer.setSize( canvasWidth, canvasHeight );
   camera.aspect = canvasWidth / canvasHeight;
+  let position = Math.min(1000 / canvasWidth, 1000 / canvasHeight);
+  camera.position.set(0, position, position)
   camera.updateProjectionMatrix();
-  render()
 }
 
 window.addEventListener('resize', onWindowResize, false)
