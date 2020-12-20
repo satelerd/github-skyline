@@ -143,11 +143,8 @@ const init = () => {
   renderer.setClearColor(0xffffff, 1)
   document.body.appendChild(renderer.domElement)
 
-  const textureLoader = new THREE.CubeTextureLoader();
-  textureLoader.setPath( 'textures/cube/Bridge2/' );
-
   // MATERIALS
-  let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x40c463, transparent: true, opacity: 0.2, side: THREE.DoubleSide } )
+  // let phongMaterial = new THREE.MeshPhongMaterial( { color: 0xC86033, transparent: true, opacity: 0.2, side: THREE.DoubleSide } )
   bronzeMaterial = new THREE.MeshStandardMaterial( {metalness: 0.95, roughness: 0.5, color: 0xC86033  })
 
   // LIGHTS
@@ -172,22 +169,22 @@ const init = () => {
   scene.add(dLight4)
 
   // LOAD REFERENCE MODEL
-  let loader = new GLTFLoader().setPath('../models/')
-  loader.load('ashtom-orig.glb', function (gltf) {
-    gltf.scene.traverse(function (child) {
-      if (child.isMesh) {
-        child.material = phongMaterial
-        child.material.depthWrite = !child.material.transparent
-      }
-    })
+  // let loader = new GLTFLoader().setPath('../models/')
+  // loader.load('ashtom-orig.glb', function (gltf) {
+  //   gltf.scene.traverse(function (child) {
+  //     if (child.isMesh) {
+  //       child.material = phongMaterial
+  //       child.material.depthWrite = !child.material.transparent
+  //     }
+  //   })
 
-    gltf.scene.rotation.x = Math.PI/2
-    gltf.scene.rotation.y = -Math.PI
+  //   gltf.scene.rotation.x = Math.PI/2
+  //   gltf.scene.rotation.y = -Math.PI
 
-    // let worldAxis = new THREE.AxesHelper(2);
-    // scene.add(worldAxis)
-    render()
-  })
+  //   // let worldAxis = new THREE.AxesHelper(2);
+  //   // scene.add(worldAxis)
+  //   render()
+  // })
 
   // BASE GEOMETRY
   let baseLoader = new GLTFLoader().setPath('../models/')
@@ -254,6 +251,19 @@ const init = () => {
   barGroup.position.y -= groupCenter.y
   scene.add(group)
   group.rotateX(-Math.PI/2)
+
+  const plane = new THREE.Mesh(
+    new THREE.PlaneBufferGeometry( 10000, 10000 ),
+    new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.8, transparent: true } )
+  );
+  plane.rotation.x = - Math.PI / 2;
+  plane.position.y = -0.04;
+  scene.add(plane)
+
+  let reflection = group.clone()
+  reflection.applyMatrix(new THREE.Matrix4().makeScale(1, -1, 1));
+  reflection.position.y = -0.1
+  scene.add(reflection)
   
   })
 
