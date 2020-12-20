@@ -129,12 +129,14 @@ const createText = () => {
 const init = () => {
   // SCENE
   scene = new THREE.Scene()
+  scene.background = new THREE.Color( 0xffffff );
 
   // CAMERA
   camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 10 )
 
   // RENDERER
   renderer = new THREE.WebGLRenderer({ antialias: true })
+  renderer.setClearColor(0xffffff, 0);
   renderer.setPixelRatio( window.devicePixelRatio )
   renderer.setSize( window.innerWidth, window.innerHeight )
   renderer.outputEncoding = THREE.sRGBEncoding
@@ -146,18 +148,28 @@ const init = () => {
 
   // MATERIALS
   let phongMaterial = new THREE.MeshPhongMaterial( { color: 0x40c463, transparent: true, opacity: 0.2, side: THREE.DoubleSide } )
-  bronzeMaterial = new THREE.MeshStandardMaterial( {metalness: 1, roughness: 0.3})
+  bronzeMaterial = new THREE.MeshStandardMaterial( {metalness: 0.95, roughness: 0.5, color: 0xC86033  })
 
   // LIGHTS
-  const dLight1 = new THREE.DirectionalLight(0xebeb8c, 0.8)
-  dLight1.position.set(-2, -5, 5);
+  const dLight1 = new THREE.DirectionalLight(0xffffff, 0.7)
+  dLight1.position.set(2, 0, 2);
   dLight1.target.position.set(0, 0, 0);
-  const dLight2 = new THREE.DirectionalLight(0xebeb8c, 0.8)
-  dLight2.position.set(2, -5, 5);
-  dLight2.target.position.set(0, 0, 0);
-
   scene.add(dLight1)
+  
+  const dLight2 = new THREE.DirectionalLight(0xffffff, 0.7)
+  dLight2.position.set(-2, 0, 2);
+  dLight2.target.position.set(0, 0, 0);
   scene.add(dLight2)
+
+  const dLight3 = new THREE.DirectionalLight(0xffffff, 0.7)
+  dLight3.position.set(0, 0, -2);
+  dLight3.target.position.set(0, 0, 0);
+  scene.add(dLight3)
+
+  const dLight4 = new THREE.DirectionalLight(0xffffff, 0.7)
+  dLight4.position.set(3, 4, 0);
+  dLight4.target.position.set(0, 0, 0);
+  scene.add(dLight4)
 
   // LOAD REFERENCE MODEL
   let loader = new GLTFLoader().setPath('../models/')
@@ -253,13 +265,14 @@ const init = () => {
 
   controls = new OrbitControls(camera, renderer.domElement)
   controls.screenSpacePanning = false;
-  controls.minPolarAngle = Math.PI / 3
-  controls.maxPolarAngle = Math.PI / 3;
+  controls.minPolarAngle = Math.PI / 4;
+  controls.maxPolarAngle = Math.PI / 2 * 0.9;
+  controls.autoRotate = true;
   controls.addEventListener('change', render);
   controls.screenSpacePanning = true
   controls.enableDamping = true
   controls.enableZoom = false
-  controls.dampingFactor = 0.1;
+  controls.dampingFactor = 0.02;
 
   camera.lookAt(center)
   controls.update()
