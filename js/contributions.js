@@ -49,40 +49,17 @@ async function loadJSON(username, year) {
 
 loadJSON(username, year)
 
-const fixSideNormals = (geometry) => {
-  let triangle = new THREE.Triangle()
-
-  // "fix" side normals by removing z-component of normals for side faces
-  var triangleAreaHeuristics = 0.1 * ( fontHeight * fontSize );
-  for (var i = 0; i < geometry.faces.length; i++) {
-    let face = geometry.faces[i]
-
-    if ( face.materialIndex == 1 ) {
-      for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
-        face.vertexNormals[ j ].z = 0
-        face.vertexNormals[ j ].normalize()
-      }
-
-      let va = geometry.vertices[ face.a ]
-      let vb = geometry.vertices[ face.b ]
-      let vc = geometry.vertices[ face.c ]
-
-      let s = triangle.set( va, vb, vc ).getArea()
-
-      if ( s > triangleAreaHeuristics ) {
-        for ( var j = 0; j < face.vertexNormals.length; j ++ ) {
-          face.vertexNormals[ j ].copy(face.normal)
-        }
-      }
-    }
-  }
-}
-
 const createText = () => {
   let nameGeo = new THREE.TextGeometry(username, {
     font: font,
     size: fontSize,
-    height: fontHeight
+    height: fontHeight,
+    bevelEnabled: true,
+
+    bevelThickness: 0.0005,
+		bevelSize: 0,
+		bevelOffset: 0,
+		bevelSegments: 10
   })
 
   let textGroup = new THREE.Group()
@@ -93,14 +70,15 @@ const createText = () => {
   let yearGeo = new THREE.TextGeometry(year, {
     font: font,
     size: fontSize,
-    height: fontHeight
+    height: fontHeight,
+    bevelEnabled: true,
+
+    bevelThickness: 0.0005,
+		bevelSize: 0,
+		bevelOffset: 0,
+		bevelSegments: 10
+    
   })
-
-  yearGeo.computeBoundingBox()
-  yearGeo.computeVertexNormals()
-
-  fixSideNormals(nameGeo)
-  fixSideNormals(yearGeo)
 
   nameGeo = new THREE.BufferGeometry().fromGeometry(nameGeo)
   let nameMesh = new THREE.Mesh(nameGeo, bronzeMaterial)
@@ -113,7 +91,6 @@ const createText = () => {
   nameMesh.geometry.rotateY(Math.PI * 2)
   textGroup.add(nameMesh)
 
-  yearGeo = new THREE.BufferGeometry().fromGeometry(yearGeo)
   let yearMesh = new THREE.Mesh(yearGeo, bronzeMaterial)
 
   yearMesh.position.x = 0.280
@@ -129,31 +106,28 @@ const createText = () => {
 const init = () => {
   // SCENE
   scene = new THREE.Scene()
-  scene.background = new THREE.Color( 0xffffff );
+  scene.background = null;
 
   // CAMERA
   camera = new THREE.PerspectiveCamera( 50, window.innerWidth / window.innerHeight, 0.01, 10 )
 
   // RENDERER
-  renderer = new THREE.WebGLRenderer({ antialias: true })
-  renderer.setClearColor(0xffffff, 0);
+  renderer = new THREE.WebGLRenderer({ antialias: true, alpha: true, canvas: document.querySelector("canvas#three") })
   renderer.setPixelRatio( window.devicePixelRatio )
   renderer.setSize( window.innerWidth, window.innerHeight )
   renderer.outputEncoding = THREE.sRGBEncoding
-  renderer.setClearColor(0xffffff, 1)
-  document.body.appendChild(renderer.domElement)
 
   // MATERIALS
   // let phongMaterial = new THREE.MeshPhongMaterial( { color: 0xC86033, transparent: true, opacity: 0.2, side: THREE.DoubleSide } )
-  bronzeMaterial = new THREE.MeshStandardMaterial( {metalness: 0.95, roughness: 0.5, color: 0xC86033  })
+  bronzeMaterial = new THREE.MeshStandardMaterial( {metalness: 0.99, roughness: 0.5, color: 0xC86033  })
 
   // LIGHTS
-  const dLight1 = new THREE.DirectionalLight(0xffffff, 0.7)
+  const dLight1 = new THREE.DirectionalLight(0xdbedff, 0.7)
   dLight1.position.set(2, 0, 2);
   dLight1.target.position.set(0, 0, 0);
   scene.add(dLight1)
   
-  const dLight2 = new THREE.DirectionalLight(0xffffff, 0.7)
+  const dLight2 = new THREE.DirectionalLight(0xfedbf0, 0.7)
   dLight2.position.set(-2, 0, 2);
   dLight2.target.position.set(0, 0, 0);
   scene.add(dLight2)
@@ -252,18 +226,18 @@ const init = () => {
   scene.add(group)
   group.rotateX(-Math.PI/2)
 
-  const plane = new THREE.Mesh(
-    new THREE.PlaneBufferGeometry( 10000, 10000 ),
-    new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.8, transparent: true } )
-  );
-  plane.rotation.x = - Math.PI / 2;
-  plane.position.y = -0.04;
-  scene.add(plane)
+  // const plane = new THREE.Mesh(
+  //   new THREE.PlaneBufferGeometry( 10000, 10000 ),
+  //   new THREE.MeshBasicMaterial( { color: 0xffffff, opacity: 0.8, transparent: true } )
+  // );
+  // plane.rotation.x = - Math.PI / 2;
+  // plane.position.y = -0.04;
+  // scene.add(plane)
 
-  let reflection = group.clone()
-  reflection.applyMatrix(new THREE.Matrix4().makeScale(1, -1, 1));
-  reflection.position.y = -0.1
-  scene.add(reflection)
+  // let reflection = group.clone()
+  // reflection.applyMatrix(new THREE.Matrix4().makeScale(1, -1, 1));
+  // reflection.position.y = -0.1
+  // scene.add(reflection)
   
   })
 
@@ -282,7 +256,7 @@ const init = () => {
   controls.screenSpacePanning = true
   controls.enableDamping = true
   controls.enableZoom = false
-  controls.dampingFactor = 0.02;
+  controls.dampingFactor = 0.1;
 
   camera.lookAt(center)
   controls.update()
