@@ -1,32 +1,55 @@
-# GitHub Skyline Revived
+# GitHub Skyline
 
-Inspirado en [Github Skyline](https://skyline.github.com) (2021, descontinuado)
+Inspired by [Github Skyline](https://skyline.github.com) (2021, discontinued)
 
-Este repo es un fork de un fork de un fork de un fork de un fork del "original" replicado por [github.com/jasonlong](https://github.com/jasonlong)...
+This repo is a fork of a fork of a fork of a fork of a fork of the original Github project replicated by [github.com/jasonlong](https://github.com/jasonlong)...
 
+<br>
 
-## Características
+## Features
 
-- Utiliza la API GraphQL de GitHub para datos actualizados
+- Uses GitHub's GraphQL API to get up-to-date data
 
-- Renderiza contribuciones de GitHub como un skyline en 3D
+- Renders GitHub contributions as a skyline using three.js
 
-- Exporta como STL para impresión 3D
+- Exports as STL for 3D printing
 
-## Uso
+<br>
 
-1. Clona el repo
+## Usage
 
-2. Ejecuta un servidor local:
+1. Clone the repo
+
+<br>
+
+2. Edit the `js/contributions.js` file (line 8) and add your GitHub token:
+
+   ```javascript
+   const config = {
+     GITHUB_TOKEN: '<YOUR_GITHUB_TOKEN>'
+   };
+   ```
+
+   You can create a GitHub token [here](https://github.com/settings/tokens).
+
+<br>
+
+3. Run a local server:
+
    ```
    python -m http.server 8000
    ```
 
-3. Navega a:
+<br>
+
+4. Check your skyline at:
+
    ```
    http://localhost:8000/?username=<github_user>&year=<YYYY>
    ```
-   Reemplaza `<github_user>` y `<YYYY>`. Ejemplo:
+
+   Replace `<github_user>` and `<YYYY>`. Example:
+
    ```
    ?username=satelerd&year=2021
    ```

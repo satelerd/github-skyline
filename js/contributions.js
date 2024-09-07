@@ -4,6 +4,9 @@ import { OrbitControls } from './OrbitControls.js';
 import { GUI } from './dat.gui.module.js';
 import { STLExporter } from './STLExporter.js';
 
+const GITHUB_API_URL = 'https://api.github.com/graphql';
+const GITHUB_TOKEN = '<YOUR_GITHUB_TOKEN>'; // Replace this with your GitHub token
+
 const BASE_LENGTH = 0.834
 const BASE_WIDTH = 0.167
 const BASE_HEIGHT = 0.05
@@ -11,7 +14,7 @@ const CUBE_SIZE = 0.0143
 const MAX_HEIGHT = 0.14
 const FACE_ANGLE = 104.79
 
-let username = "satelerd" // Cambia "nat" por tu nombre de usuario de GitHub
+let username = "satelerd"
 let year = "" + (new Date()).getFullYear()
 let json = {}
 let font = undefined
@@ -33,9 +36,6 @@ if (urlParams.has('username')) {
 if (urlParams.has('year')) {
   year = urlParams.get('year')
 }
-
-const GITHUB_API_URL = 'https://api.github.com/graphql';
-const GITHUB_TOKEN = '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'; // Reemplaza esto con tu token de GitHub
 
 async function loadJSON(username, year) {
   const query = `
@@ -82,17 +82,17 @@ async function loadJSON(username, year) {
     }
 
     json = processGitHubData(data.data, year, username);
-    console.log("Datos procesados:", json);
+    console.log("Processed data:", json);
     if (json.contributions && json.contributions.length > 0) {
       init();
       animate();
     } else {
-      console.error("No se encontraron contribuciones para este usuario y año");
-      alert("No se encontraron contribuciones para este usuario y año. Por favor, verifica el nombre de usuario y el año.");
+      console.error("No contributions found for this user and year");
+      alert("No contributions found for this user and year. Please verify the username and year.");
     }
   } catch (error) {
-    console.error("Error al cargar JSON:", error);
-    alert("Error al cargar los datos. Por favor, verifica tu conexión a internet y tu token de GitHub.");
+    console.error("Error loading JSON:", error);
+    alert("Error loading data. Please check your internet connection and your GitHub token.");
   }
 }
 
