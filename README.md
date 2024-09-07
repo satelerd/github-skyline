@@ -1,20 +1,55 @@
-Given a Github username and a year, renders a 3D model of their contribution chart. The data is fetched via a serverless function ([repo](https://github.com/martinwoodward/json-contributions) which also calculates distribution data).
+# GitHub Skyline
 
-```
-?username=<username>&year=<year>
-```
+Inspired by [Github Skyline](https://skyline.github.com) (2021, discontinued)
 
-If no year is provided, the current year will be used.
+This repo is a fork of a fork of a fork of a fork of a fork of the original Github project replicated by [github.com/jasonlong](https://github.com/jasonlong)...
 
-Examples: 
- - https://skyline.martinwoodward.vercel.app/?username=martinwoodward
- - https://skyline.martinwoodward.vercel.app/?username=martinwoodward&year=2020
- - https://skyline.martinwoodward.vercel.app/?username=mdo&year=2020
+<br>
 
-#### Development
+## Features
 
-I've been using `vercel` for local dev. To load up a local server: `vercel dev`.
+- Uses GitHub's GraphQL API to get up-to-date data
 
-Note that this version creates a distribution from the 99th percentile on the contributions per day to stop the odd _really_ big days blowing out the scale. It also has a default minimum for non-zero contribition days (10% of the maximum height)
+- Renders GitHub contributions as a skyline using three.js
 
+- Exports as STL for 3D printing
 
+<br>
+
+## Usage
+
+1. Clone the repo
+
+<br>
+
+2. Edit the `js/contributions.js` file (line 8) and add your GitHub token:
+
+   ```javascript
+   const config = {
+     GITHUB_TOKEN: '<YOUR_GITHUB_TOKEN>'
+   };
+   ```
+
+   You can create a GitHub token [here](https://github.com/settings/tokens).
+
+<br>
+
+3. Run a local server:
+
+   ```
+   python -m http.server 8000
+   ```
+
+<br>
+
+4. Check your skyline at:
+
+   ```
+   http://localhost:8000/?username=<github_user>&year=<YYYY>
+   ```
+
+   Replace `<github_user>` and `<YYYY>`. Example:
+
+   ```
+   ?username=satelerd&year=2021
+   ```

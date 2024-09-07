@@ -39,15 +39,31 @@
     </style>
   </head>
   <body style="height: 100%; width: 100%">
-    <div id="info">
+    <div id="info" style="z-index: 1000;">
       <button id="exportASCII">export ASCII</button>
       <button id="exportBinary">export STL</button>
     </div>
     <div>
       <img src="images/hero-glow.svg" />
       <canvas id="three"></canvas>
-		</div>
-		
-		<script type="module" src="js/contributions.js"></script>
+    </div>
+    
+    <script type="module">
+      import * as THREE from './js/three.module.js';
+      import { GLTFLoader } from './js/GLTFLoader.js';
+      import { OrbitControls } from './js/OrbitControls.js';
+      import { GUI } from './js/dat.gui.module.js';
+      import { STLExporter } from './js/STLExporter.js';
+      import { init, animate } from './js/contributions.js';
+
+      window.THREE = THREE;
+      window.GLTFLoader = GLTFLoader;
+      window.OrbitControls = OrbitControls;
+      window.GUI = GUI;
+      window.STLExporter = STLExporter;
+
+      init();
+      animate();
+    </script>
   </body>
 </html>
